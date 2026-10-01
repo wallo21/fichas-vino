@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ficha de vino · Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e3eadf;--card:#f3f6f0;--ink:#2a1a20;--wine:#5a1530;--green:#2d4535;--brass:#9a7428;--line:#c3cfbf;--on-wine:#f3f6f0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17211b;--card:#202d25;--ink:#e8eee5;--wine:#b8486c;--green:#8fb59b;--brass:#d2ad5c;--line:#34463b;--on-wine:#fff}}
+:root[data-theme="dark"]{--bg:#17211b;--card:#202d25;--ink:#e8eee5;--wine:#b8486c;--green:#8fb59b;--brass:#d2ad5c;--line:#34463b;--on-wine:#fff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 'DM Sans',system-ui,sans-serif}
+main{max-width:430px;margin:0 auto;padding:14px 18px 40px}
+.bar{display:flex;gap:8px;justify-content:space-between;align-items:center;font-size:13px;color:var(--green);margin-bottom:14px}
+.bar b{font-weight:700}
+.seg{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:none;color:var(--ink);padding:6px 12px;font:500 13px 'DM Sans',sans-serif;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--wine);color:var(--on-wine)}
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.label{background:var(--card);border:1px solid var(--wine);outline:1px solid var(--wine);outline-offset:-7px;border-radius:4px;text-align:center;padding:30px 20px 26px;margin:6px 0 18px}
+.label small{display:block;color:var(--green);font-size:14px}
+.label h1{font:600 30px/1.1 'Fraunces',Georgia,serif;margin:10px 0 2px;color:var(--wine)}
+.yr{font:800 84px/1 'Fraunces',Georgia,serif;color:var(--wine);letter-spacing:-2px;margin:6px 0}
+.reg{color:var(--brass);font-weight:700;font-size:14px}
+.tech{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.tech div{border-top:2px solid var(--brass);padding-top:6px;font-size:13px;color:var(--green)}
+.tech b{display:block;font:600 18px 'Fraunces',Georgia,serif;color:var(--ink)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;color:var(--green);padding:10px 4px;font:500 15px 'DM Sans',sans-serif;border-bottom:3px solid transparent;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--wine);border-color:var(--wine);font-weight:700}
+.panel p{font:400 17px/1.65 'Fraunces',Georgia,serif;margin:0}
+.panel ul{list-style:none;margin:0;padding:0}
+.panel li{padding:11px 0;border-bottom:1px solid var(--line)}
+.panel li b{display:block;color:var(--wine);font-size:14px}
+.pass{margin-top:26px;background:var(--wine);color:var(--on-wine);border-radius:10px;padding:18px}
+.pass h2{font:600 19px 'Fraunces',Georgia,serif;margin:0 0 4px}
+.pass p{margin:0 0 12px;font-size:14px;opacity:.9}
+.stamps{display:flex;gap:10px;align-items:center}
+.dot{width:44px;height:44px;border-radius:50%;border:2px dashed var(--on-wine);display:grid;place-items:center;font:700 15px 'Fraunces',serif;opacity:.55}
+.dot.on{border-style:solid;background:var(--brass);color:#fff;opacity:1;transform:rotate(-8deg)}
+.stampbtn{margin-left:auto;border:0;border-radius:999px;background:var(--on-wine);color:var(--wine);font:700 14px 'DM Sans',sans-serif;padding:10px 16px;cursor:pointer}
+.stampbtn:disabled{opacity:.6;cursor:default}
+.foot{margin-top:20px;font-size:12px;color:var(--green);text-align:center}
+@media (prefers-reduced-motion:no-preference){.dot{transition:transform .25s,background .25s}}
+</style>
+</head>
+<body>
+<main>
+ <div class="bar"><span id="demo"></span>
+  <div class="seg" id="langs"><button data-l="es">ES</button><button data-l="en">EN</button><button data-l="fr">FR</button></div></div>
+ <div class="seg" id="wines" style="margin-bottom:12px;width:fit-content"></div>
+ <section class="label"><small>Bodega Altos del Sur</small><h1 id="wn"></h1><div class="yr" id="wy"></div><div class="reg" id="wr"></div></section>
+ <div class="tech" id="tech"></div>
+ <div class="tabs" role="tablist" id="tabs"></div>
+ <div class="panel" id="panel" role="tabpanel"></div>
+ <section class="pass"><h2 id="ph"></h2><p id="pp"></p>
+  <div class="stamps"><span class="dot" id="d0">A</span><span class="dot" id="d1">B</span><button class="stampbtn" id="sb"></button></div></section>
+ <div class="foot" id="ft"></div>
+</main>
+<script>
+const UI={
+es:{demo:'Así lo ve quien escanea',tabs:['Historia','Ingredientes','Maridaje'],tech:['Altitud','Alcohol','Servir a'],ph:'Pasaporte de vinos',hint:'Sellá los 2 vinos y ganá una copa de cortesía.',win:'¡Recorrido completo! Retirá tu copa de cortesía.',st:'Sellar este vino',done:'Sellado',ft:'Demo con datos ficticios · Altos del Sur no es una bodega real'},
+en:{demo:'What a visitor sees',tabs:['Story','Ingredients','Pairing'],tech:['Altitude','Alcohol','Serve at'],ph:'Wine passport',hint:'Stamp both wines and win a complimentary glass.',win:'Tour complete! Collect your complimentary glass.',st:'Stamp this wine',done:'Stamped',ft:'Demo with fictional data · Altos del Sur is not a real winery'},
+fr:{demo:'Ce que voit le visiteur',tabs:['Histoire','Ingrédients','Accords'],tech:['Altitude','Alcool','Servir à'],ph:'Passeport des vins',hint:'Tamponnez les 2 vins et gagnez un verre offert.',win:'Parcours terminé ! Retirez votre verre offert.',st:'Tamponner ce vin',done:'Tamponné',ft:'Démo avec données fictives · Altos del Sur n\'est pas un vrai domaine'}};
+const W=[
+{n:'Malbec Reserva',y:2022,r:'Malbec · Valle de Uco, Mendoza',t:['1.100 m','14 %','16–18 °C'],
+ s:{es:'En 2009 la familia plantó las primeras vides de Malbec en un suelo de piedra y arena que obliga a la planta a esforzarse. Aquella primera cosecha dio apenas 800 botellas. Hoy cada parcela se cosecha a mano, a primera hora de la mañana, para llegar fresca a la bodega.',en:'In 2009 the family planted its first Malbec vines in stony, sandy soil that makes each plant work for its fruit. That first harvest gave barely 800 bottles. Today every plot is picked by hand at first light, so the grapes reach the cellar fresh.',fr:'En 2009, la famille a planté ses premiers pieds de Malbec dans un sol de pierres et de sable qui force la vigne à se dépasser. Cette première récolte n\'a donné que 800 bouteilles. Aujourd\'hui, chaque parcelle est vendangée à la main à l\'aube, pour que le raisin arrive frais au chai.'},
+ i:{es:[['Uva','100 % Malbec, cosecha manual'],['Levaduras','Indígenas, propias del viñedo'],['Crianza','12 meses en roble francés'],['Sulfitos','Dosis mínima (contiene sulfitos)'],['Vegano','Sí, sin clarificantes de origen animal']],en:[['Grape','100% Malbec, hand-harvested'],['Yeast','Native, from the vineyard'],['Ageing','12 months in French oak'],['Sulphites','Minimal dose (contains sulphites)'],['Vegan','Yes, no animal-based fining agents']],fr:[['Cépage','100 % Malbec, vendange manuelle'],['Levures','Indigènes, issues du vignoble'],['Élevage','12 mois en chêne français'],['Sulfites','Dose minimale (contient des sulfites)'],['Végan','Oui, sans colle d\'origine animale']]},
+ p:{es:['Asado de tira','Empanadas de carne cortada a cuchillo','Queso provolone a la parrilla'],en:['Grilled short ribs','Hand-cut beef empanadas','Grilled provolone cheese'],fr:['Côtes de bœuf grillées','Empanadas au bœuf coupé au couteau','Provolone grillé']}},
+{n:'Chardonnay',y:2023,r:'Chardonnay · Tupungato, Mendoza',t:['1.300 m','13 %','8–10 °C'],
+ s:{es:'Fue el primer blanco de la bodega y nació de una apuesta: buscar frescura en altura. Una parte fermenta en barrica usada para ganar textura sin perder acidez. Se embotella joven, para tomarlo en el año.',en:'This was the winery\'s first white, born from a bet on freshness at altitude. Part of it ferments in used barrels for texture without losing acidity. It is bottled young, to be enjoyed within the year.',fr:'C\'est le premier blanc du domaine, né d\'un pari sur la fraîcheur en altitude. Une partie fermente en barrique usagée pour gagner en texture sans perdre en acidité. Mis en bouteille jeune, il se boit dans l\'année.'},
+ i:{es:[['Uva','100 % Chardonnay, cosecha temprana'],['Fermentación','30 % en barrica usada'],['Crianza','6 meses sobre sus lías'],['Sulfitos','Dosis mínima (contiene sulfitos)'],['Vegano','Sí, sin clarificantes de origen animal']],en:[['Grape','100% Chardonnay, early harvest'],['Fermentation','30% in used barrels'],['Ageing','6 months on its lees'],['Sulphites','Minimal dose (contains sulphites)'],['Vegan','Yes, no animal-based fining agents']],fr:[['Cépage','100 % Chardonnay, vendange précoce'],['Fermentation','30 % en barrique usagée'],['Élevage','6 mois sur lies'],['Sulfites','Dose minimale (contient des sulfites)'],['Végan','Oui, sans colle d\'origine animale']]},
+ p:{es:['Ceviche de pescado blanco','Trucha patagónica','Queso de cabra fresco'],en:['White fish ceviche','Patagonian trout','Fresh goat cheese'],fr:['Ceviche de poisson blanc','Truite de Patagonie','Fromage de chèvre frais']}}];
+let L=(navigator.language||'es').slice(0,2),w=0,tab=0,stamped=[false,false];
+if(!UI[L])L='es';
+const $=id=>document.getElementById(id);
+function render(){const u=UI[L],d=W[w];document.documentElement.lang=L;
+ $('demo').textContent=u.demo;
+ document.querySelectorAll('#langs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===L));
+ $('wines').innerHTML=W.map((x,i)=>`<button data-w="${i}" aria-pressed="${i===w}">${x.n}</button>`).join('');
+ $('wn').textContent=d.n;$('wy').textContent=d.y;$('wr').textContent=d.r;
+ $('tech').innerHTML=d.t.map((v,i)=>`<div>${u.tech[i]}<b>${v}</b></div>`).join('');
+ $('tabs').innerHTML=u.tabs.map((x,i)=>`<button role="tab" data-t="${i}" aria-selected="${i===tab}">${x}</button>`).join('');
+ $('panel').innerHTML=tab===0?`<p>${d.s[L]}</p>`:tab===1?`<ul>${d.i[L].map(x=>`<li><b>${x[0]}</b>${x[1]}</li>`).join('')}</ul>`:`<ul>${d.p[L].map(x=>`<li>${x}</li>`).join('')}</ul>`;
+ $('ph').textContent=u.ph;
+ const all=stamped[0]&&stamped[1];$('pp').textContent=all?u.win:u.hint;
+ stamped.forEach((s,i)=>$('d'+i).classList.toggle('on',s));
+ $('sb').textContent=stamped[w]?u.done:u.st;$('sb').disabled=stamped[w];
+ $('ft').textContent=u.ft}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.l)L=b.dataset.l;if(b.dataset.w){w=+b.dataset.w}if(b.dataset.t)tab=+b.dataset.t;
+ if(b.id==='sb')stamped[w]=true;render()});
+render();
+</script>
+</body>
+</html>
